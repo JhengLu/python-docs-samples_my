@@ -12,26 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-apiVersion: v1
-kind: Service
-metadata:
-  name: grpc-hello
-spec:
-  ports:
-  - port: 80
-    targetPort: 9000
-    protocol: TCP
-    name: http
-  selector:
-    app: grpc-hello
-  type: LoadBalancer
----
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: grpc-hello
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      app: grpc-hello
   template:
     metadata:
       labels:
@@ -43,12 +32,12 @@ spec:
         args: [
           "--http2_port=9000",
           "--backend=grpc://127.0.0.1:50051",
-          "--service=SERVICE_NAME",
+          "--service=hellogrpc.endpoints.rosy-proposal-413605.cloud.goog",
           "--rollout_strategy=managed",
         ]
         ports:
           - containerPort: 9000
       - name: python-grpc-hello
-        image: gcr.io/GCLOUD_PROJECT/python-grpc-hello:1.0
+        image: gcr.io/rosy-proposal-413605/python-grpc-hello:1.0
         ports:
           - containerPort: 50051
